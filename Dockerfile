@@ -35,5 +35,5 @@ USER root
 RUN cd /home/user/protobuf-21.9/python && python setup.py install --cpp_implementation
 
 USER user
-# Set /home/user when run a docker container
+RUN mkdir /home/user/projects
 WORKDIR /home/user
