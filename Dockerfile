@@ -1,5 +1,8 @@
 FROM ubuntu:22.04
 
+# Add description
+LABEL org.opencontainers.image.description "Docker image to develop POC Agrirouter interface."
+
 # Set ROJ proxy
 RUN echo "Acquire::http::Proxy \"http://192.168.1.107:8080/\";" > /etc/apt/apt.conf
 
