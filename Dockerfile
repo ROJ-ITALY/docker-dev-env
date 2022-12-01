@@ -48,9 +48,10 @@ RUN cp /home/user/protoc_3.18.3/bin/protoc /usr/local/bin/protoc && chmod 755 /u
 USER user
 
 # Install AG SDK python
-RUN cd /home/user && git clone -b master https://github.com/DKE-Data/agrirouter-sdk-python.git
+RUN cd /home/user && git clone -b master https://github.com/ROJ-ITALY/agrirouter-sdk-python.git
 USER root
 RUN cd /home/user/agrirouter-sdk-python && python setup.py install
+RUN cd /usr/local/lib/python3.10/dist-packages && mv agrirouter-1.0.0-py3.10.egg agrirouter-1.0.0-py3.10.zip && unzip -d agrirouter-1.0.0-py3.10.egg agrirouter-1.0.0-py3.10.zip && rm agrirouter-1.0.0-py3.10.zip
 
 USER user
 
