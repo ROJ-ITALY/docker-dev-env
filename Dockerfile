@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
 # Add description
 LABEL org.opencontainers.image.description "Docker image to develop POC Agrirouter interface."
@@ -9,7 +9,7 @@ RUN echo "Acquire::http::Proxy \"http://192.168.1.107:8080/\";" > /etc/apt/apt.c
 # Install deb packages to build protobuf from source (see README.md under src/)
 # Install Python 3.10.6 (>=3.7 to support python c++ implementation proto runtime library version 4.21.9)
 # Install other useful packages
-RUN apt-get update && apt-get install -y autoconf automake libtool curl make g++ unzip \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y autoconf automake libtool curl make g++ unzip \
 										 python-is-python3 python3-pip \
 										 pkg-config iputils-ping iproute2 net-tools sudo git libffi-dev
 
@@ -48,10 +48,10 @@ RUN cp /home/user/protoc_3.18.3/bin/protoc /usr/local/bin/protoc && chmod 755 /u
 USER user
 
 # Install AG SDK python
-RUN cd /home/user && git clone -b master https://github.com/ROJ-ITALY/agrirouter-sdk-python.git
+RUN cd /home/user && git clone -b poc_cu_roj https://github.com/ROJ-ITALY/agrirouter-sdk-python.git
 USER root
 RUN cd /home/user/agrirouter-sdk-python && python setup.py install
-RUN cd /usr/local/lib/python3.10/dist-packages && mv agrirouter-1.0.0-py3.10.egg agrirouter-1.0.0-py3.10.zip && unzip -d agrirouter-1.0.0-py3.10.egg agrirouter-1.0.0-py3.10.zip && rm agrirouter-1.0.0-py3.10.zip
+RUN cd /usr/local/lib/python3.8/dist-packages && mv agrirouter-1.0.0-py3.8.egg agrirouter-1.0.0-py3.8.zip && unzip -d agrirouter-1.0.0-py3.8.egg agrirouter-1.0.0-py3.8.zip && rm agrirouter-1.0.0-py3.8.zip
 
 USER user
 
