@@ -1,14 +1,11 @@
 FROM ubuntu:20.04
 
 # Add description
-LABEL org.opencontainers.image.description "Docker image to develop POC Agrirouter interface."
+LABEL org.opencontainers.image.description "Docker image to develop the POC for Agrirouter interface."
 
 # Set ROJ proxy
 RUN echo "Acquire::http::Proxy \"http://192.168.1.107:8080/\";" > /etc/apt/apt.conf
 
-# Install deb packages to build protobuf from source (see README.md under src/)
-# Install Python 3.10.6 (>=3.7 to support python c++ implementation proto runtime library version 4.21.9)
-# Install other useful packages
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y autoconf automake libtool curl make g++ unzip \
 										 python-is-python3 python3-pip \
 										 pkg-config iputils-ping iproute2 net-tools sudo git libffi-dev
@@ -19,41 +16,32 @@ ARG USER_PASSWORD
 RUN useradd -ms /bin/bash -G sudo -p "$(openssl passwd -1 ${USER_PASSWORD})" user
 
 USER user
-
-# AG SDK PYTHON seems depending from protobuf 3.18.3 so it's not necessary build and install protobuf last version.
-#******************
-#COPY protobuf-all-21.9.tar.gz /home/user
-# Build and install C++ proto runtime library (version 3.21.9) and protoc (version 3.21.9)
-#RUN cd /home/user && tar xvzf protobuf-all-21.9.tar.gz && cd protobuf-21.9/ && \
-#	./configure && \
-#	make -j8 && \
-#	make check
-#USER root
-#RUN cd /home/user/protobuf-21.9/ && make install && ldconfig
-
-# Build and install Python C++ implementation proto runtime library (version 4.21.9)
-#USER user
-RUN pip3 install tzdata
-#RUN cd /home/user/protobuf-21.9/python && python setup.py build --cpp_implementation && python setup.py test --cpp_implementation
-#USER root
-#RUN cd /home/user/protobuf-21.9/python && python setup.py install --cpp_implementation
-#******************
-
 # Add protoc binary (version 3.18.3)
-COPY protoc-3.18.3-linux-x86_64.zip /home/user
-RUN cd /home/user && unzip protoc-3.18.3-linux-x86_64.zip -d protoc_3.18.3
+RUN mkdir /home/user/projects
+COPY protoc-3.18.3-linux-x86_64.zip /home/user/projects
+RUN cd /home/user/projects && unzip protoc-3.18.3-linux-x86_64.zip -d protoc_3.18.3
 USER root
-RUN cp /home/user/protoc_3.18.3/bin/protoc /usr/local/bin/protoc && chmod 755 /usr/local/bin/protoc
+RUN cp /home/user/projects/protoc_3.18.3/bin/protoc /usr/local/bin/protoc && chmod 755 /usr/local/bin/protoc
 
 USER user
-
 # Install AG SDK python
-RUN cd /home/user && git clone -b poc_cu_roj https://github.com/ROJ-ITALY/agrirouter-sdk-python.git
+RUN cd /home/user/projects && git clone -b poc_cu_roj https://github.com/ROJ-ITALY/agrirouter-sdk-python.git
+
 USER root
-RUN cd /home/user/agrirouter-sdk-python && python setup.py install
+RUN cd /home/user/projects/agrirouter-sdk-python && python setup.py install
 RUN cd /usr/local/lib/python3.8/dist-packages && mv agrirouter-1.0.0-py3.8.egg agrirouter-1.0.0-py3.8.zip && unzip -d agrirouter-1.0.0-py3.8.egg agrirouter-1.0.0-py3.8.zip && rm agrirouter-1.0.0-py3.8.zip
 
+# Install canopen (2.1.0) and python-can (4.1.0)
+RUN pip3 install canopen
+
+# Install tzdata python module
+RUN pip3 install tzdata
+
+# Kvaser's canlib
+COPY libcanlib.so.1.10.1 /usr/lib
+RUN cd /usr/lib && ln -s libcanlib.so.1.10.1 libcanlib.so.1
+RUN cd /usr/lib && ln -s libcanlib.so.1.10.1 libcanlib.so
+
 USER user
 
-RUN mkdir /home/user/projects
 WORKDIR /home/user
