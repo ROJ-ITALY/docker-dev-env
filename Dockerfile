@@ -25,17 +25,24 @@ RUN cp /home/user/projects/protoc_3.18.3/bin/protoc /usr/local/bin/protoc && chm
 
 USER user
 # Install AG SDK python
-RUN cd /home/user/projects && git clone -b poc_cu_roj https://github.com/ROJ-ITALY/agrirouter-sdk-python.git
+RUN cd /home/user/projects && git clone -b develop_roj git@github.com:ROJ-ITALY/agrirouter-sdk-python.git && git checkout tags/v1.0.0
 
 USER root
 RUN cd /home/user/projects/agrirouter-sdk-python && python setup.py install
 RUN cd /usr/local/lib/python3.8/dist-packages && mv agrirouter-1.0.0-py3.8.egg agrirouter-1.0.0-py3.8.zip && unzip -d agrirouter-1.0.0-py3.8.egg agrirouter-1.0.0-py3.8.zip && rm agrirouter-1.0.0-py3.8.zip
 
-# Install canopen (2.1.0) and python-can (4.1.0)
+# Install canopen and python-can
 RUN pip3 install canopen
 
 # Install tzdata python module
 RUN pip3 install tzdata
+
+# Install pytest python module
+RUN pip3 install pytest
+
+# Install lxml python module (validate and parse (ISO)XML)
+RUN pip3 install lxml
+RUN pip3 install shapely
 
 # Kvaser's canlib
 COPY libcanlib.so.1.10.1 /usr/lib
