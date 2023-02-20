@@ -25,7 +25,7 @@ RUN cp /home/user/projects/protoc_3.18.3/bin/protoc /usr/local/bin/protoc && chm
 
 USER user
 # Install AG SDK python
-RUN cd /home/user/projects && git clone -b develop_roj git@github.com:ROJ-ITALY/agrirouter-sdk-python.git && cd /home/user/projects/agrirouter-sdk-python && git checkout tags/v1.0.0
+RUN cd /home/user/projects && git clone -b develop_roj https://github.com/ROJ-ITALY/agrirouter-sdk-python.git && cd /home/user/projects/agrirouter-sdk-python && git checkout tags/v1.0.0
 
 USER root
 RUN cd /home/user/projects/agrirouter-sdk-python && python setup.py install
