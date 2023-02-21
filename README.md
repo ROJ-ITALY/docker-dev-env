@@ -25,7 +25,7 @@ $ docker build --build-arg USER_PASSWORD=*** -t dev-env:latest .
 ```
 
 #### Download the image from GHCR
-Click [here](https://github.com/ROJ-ITALY/docker-dev-env/pkgs/container/docker-dev-env%2Fdev-env/63084718?tag=1.0.0) and follow the instructions to download docker image for your developments.
+Click [here](https://github.com/ROJ-ITALY/docker-dev-env/pkgs/container/docker-dev-env%2Fdev-env/71806931?tag=v1.0.0) and follow the instructions to download docker image for your developments.
 
 #### Run dev-env container (this is just an example)
 ```sh
