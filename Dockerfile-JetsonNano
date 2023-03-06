@@ -10,11 +10,11 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y autoconf
 										 python3-pip \
 										 pkg-config iputils-ping iproute2 net-tools sudo git libffi-dev
 
-# Install Python 3.8.10
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3.8=3.8.10-0ubuntu1~20.04.2 \
-										 python3.8-dev=3.8.10-0ubuntu1~20.04.2
+# Install Python 3.8
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3.8=3.8.0-3ubuntu1~18.04.2 \
+										 python3.8-dev=3.8.0-3ubuntu1~18.04.2
 
-# Set Python 3.8.10 as default
+# Set Python 3.8 as default
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1 \
     && update-alternatives --set python3 /usr/bin/python3.8
 
@@ -38,6 +38,8 @@ USER user
 RUN cd /home/user/projects && git clone -b develop_roj https://github.com/ROJ-ITALY/agrirouter-sdk-python.git && cd /home/user/projects/agrirouter-sdk-python && git checkout tags/v1.0.0
 
 USER root
+RUN pip3 install --upgrade pip
+RUN pip3 install setuptools-rust
 RUN cd /home/user/projects/agrirouter-sdk-python && python3 setup.py install
 RUN cd /usr/local/lib/python3.8/dist-packages && mv agrirouter-1.0.0-py3.8.egg agrirouter-1.0.0-py3.8.zip && unzip -d agrirouter-1.0.0-py3.8.egg agrirouter-1.0.0-py3.8.zip && rm agrirouter-1.0.0-py3.8.zip
 
