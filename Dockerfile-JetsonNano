@@ -1,22 +1,14 @@
-FROM nvcr.io/nvidia/l4t-base:r32.6.1
+FROM ubuntu:20.04
 
 # Add description
 LABEL org.opencontainers.image.description "Docker image to develop the POC for Agrirouter interface."
 
 # Set ROJ proxy
-RUN echo "Acquire::http::Proxy \"http://192.168.1.107:8080/\";" > /etc/apt/apt.conf
+#RUN echo "Acquire::http::Proxy \"http://192.168.1.107:8080/\";" > /etc/apt/apt.conf
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y autoconf automake libtool curl make g++ unzip \
-										 python3-pip \
+										 python-is-python3 python3-pip \
 										 pkg-config iputils-ping iproute2 net-tools sudo git libffi-dev
-
-# Install Python 3.8
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3.8=3.8.0-3ubuntu1~18.04.2 \
-										 python3.8-dev=3.8.0-3ubuntu1~18.04.2
-
-# Set Python 3.8 as default
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1 \
-    && update-alternatives --set python3 /usr/bin/python3.8
 
 # Add username: user
 #     password: ${USER_PASSWORD}
@@ -24,28 +16,23 @@ ARG USER_PASSWORD
 RUN useradd -ms /bin/bash -G sudo -p "$(openssl passwd -1 ${USER_PASSWORD})" user
 
 USER user
-
-# Install protoc
+# Add protoc binary (version 3.18.3)
 RUN mkdir /home/user/projects
 COPY aarch64/protoc-3.18.3-linux-aarch_64.zip /home/user/projects
-RUN cd /home/user/projects && unzip protoc-3.18.3-linux-aarch_64.zip -d protoc_3.18.3
+RUN cd /home/user/projects && unzip aarch64/protoc-3.18.3-linux-aarch_64.zip -d protoc_3.18.3
 USER root
 RUN cp /home/user/projects/protoc_3.18.3/bin/protoc /usr/local/bin/protoc && chmod 755 /usr/local/bin/protoc
 
 USER user
-
 # Install AG SDK python
 RUN cd /home/user/projects && git clone -b develop_roj https://github.com/ROJ-ITALY/agrirouter-sdk-python.git && cd /home/user/projects/agrirouter-sdk-python && git checkout tags/v1.0.0
 
 USER root
-RUN pip3 install --upgrade pip
-RUN pip3 install setuptools-rust
-RUN cd /home/user/projects/agrirouter-sdk-python && python3 setup.py install
+RUN cd /home/user/projects/agrirouter-sdk-python && python setup.py install
 RUN cd /usr/local/lib/python3.8/dist-packages && mv agrirouter-1.0.0-py3.8.egg agrirouter-1.0.0-py3.8.zip && unzip -d agrirouter-1.0.0-py3.8.egg agrirouter-1.0.0-py3.8.zip && rm agrirouter-1.0.0-py3.8.zip
 
 # Install canopen and python-can
 RUN pip3 install canopen
-RUN pip3 install python-can
 
 # Install tzdata python module
 RUN pip3 install tzdata
