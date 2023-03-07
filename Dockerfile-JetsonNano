@@ -4,7 +4,7 @@ FROM ubuntu:20.04
 LABEL org.opencontainers.image.description "Docker image to develop the POC for Agrirouter interface."
 
 # Set ROJ proxy
-#RUN echo "Acquire::http::Proxy \"http://192.168.1.107:8080/\";" > /etc/apt/apt.conf
+RUN echo "Acquire::http::Proxy \"http://192.168.1.107:8080/\";" > /etc/apt/apt.conf
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y autoconf automake libtool curl make g++ unzip \
 										 python-is-python3 python3-pip \
